@@ -111,8 +111,31 @@ class Sheet(object):
             return list
 
     # 解析字符串's'类型,因为字符串内部可能包含转意字符,所以需要自己解析
+    # eg: 树\\\n\"333
     def __praseStr(self, strx):
         strring = str(strx)
+        i = 0
+        out = ''
+        while i < len(strring):
+            if strring[i] == '\\':
+                nextCh = strring[i+1]
+                if nextCh == 'r':
+                    pass
+                elif nextCh == '"':
+                    out += '\"'
+                elif nextCh == 'n':
+                    out += '\n'
+                elif nextCh == 't':
+                    out += '\t'
+                elif nextCh == '\\':
+                    out += '\\'
+
+                i += 2
+            else:
+                out += strring[i]
+                i += 1
+
+        return out
 
     #转换字符串为dict
     def __convertStrToDict(self, str):
@@ -183,7 +206,7 @@ class Sheet(object):
                 elif fieldType == 'f':
                     record[fieldName] = value
                 elif fieldType == 's':
-                    record[fieldName] = str(value)
+                    record[fieldName] = self.__praseStr(value)
                 elif fieldType == 'b':
                     record[fieldName] = bool(value)
                 elif fieldType == 'as' or fieldType == 'ai' or fieldType == 'af':
