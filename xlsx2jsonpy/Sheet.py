@@ -4,7 +4,9 @@
 import xlrd
 import json
 import math
-
+import lexical
+import types
+from types import *
 from xlrd import XL_CELL_EMPTY, XL_CELL_TEXT, XL_CELL_NUMBER, XL_CELL_DATE, XL_CELL_BOOLEAN, XL_CELL_ERROR, \
     XL_CELL_BLANK
 
@@ -87,18 +89,30 @@ class Sheet(object):
             field.userType = self.shet.cell(self.userRow, col).value
 
     #转换字符串为list
-    def __convertStrToList(self, str, typeStr):
-        type = typeStr[1]
-        list = str.split(',')
-        for i in range(len(list)):
-            if type == 's':
-                list[i] = list[i]
-            elif type == 'i':
-                list[i] = int(list[i])
-            elif type == 'f':
-                list[i] = float(list[i])
+    def __convertStrToList(self, strx, typeStr):
+        typ = typeStr[1]
+        strring  = str(strx)
+        # strring = strx
+        # strring.strip('"')
+        if typ == 's':
+            lex = lexical.lexical()
+            list = lex.prase(strring)
+            return  list
+        else:
+            list = strring.split(',')
+            for i in range(len(list)):
+                if typ == 's':
+                    list[i] = list[i]
+                elif typ == 'i':
+                    list[i] = int(float(list[i]))
+                elif typ == 'f':
+                    list[i] = float(list[i])
 
-        return list
+            return list
+
+    # 解析字符串's'类型,因为字符串内部可能包含转意字符,所以需要自己解析
+    def __praseStr(self, strx):
+        strring = str(strx)
 
     #转换字符串为dict
     def __convertStrToDict(self, str):
@@ -169,7 +183,7 @@ class Sheet(object):
                 elif fieldType == 'f':
                     record[fieldName] = value
                 elif fieldType == 's':
-                    record[fieldName] = value
+                    record[fieldName] = str(value)
                 elif fieldType == 'b':
                     record[fieldName] = bool(value)
                 elif fieldType == 'as' or fieldType == 'ai' or fieldType == 'af':

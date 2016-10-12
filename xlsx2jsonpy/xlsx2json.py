@@ -13,7 +13,6 @@ import getopt, xlrd, os, os.path, json
 
 import Sheet
 
-
 def errorHelp():
     print(u"发生了一些错误,请输入python xlsx2json.py -h来获取帮助");
 
