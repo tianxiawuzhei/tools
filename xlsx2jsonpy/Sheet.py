@@ -4,7 +4,8 @@
 import xlrd
 import json
 import math
-import lexical
+import arrayLexer
+import dictLexer
 import types
 from types import *
 from xlrd import XL_CELL_EMPTY, XL_CELL_TEXT, XL_CELL_NUMBER, XL_CELL_DATE, XL_CELL_BOOLEAN, XL_CELL_ERROR, \
@@ -91,11 +92,15 @@ class Sheet(object):
     #转换字符串为list
     def __convertStrToList(self, strx, typeStr):
         typ = typeStr[1]
-        strring  = str(strx)
+        strring = u''
+        if isinstance(strx, unicode):
+            strring = strx
+        else:
+            strring = str(strx).decode('utf-8')
         # strring = strx
         # strring.strip('"')
         if typ == 's':
-            lex = lexical.lexical()
+            lex = arrayLexer.ArrayLexer()
             list = lex.prase(strring)
             return  list
         else:
@@ -113,7 +118,12 @@ class Sheet(object):
     # 解析字符串's'类型,因为字符串内部可能包含转意字符,所以需要自己解析
     # eg: 树\\\n\"333
     def __praseStr(self, strx):
-        strring = str(strx)
+        strring = u''
+        if isinstance(strx, unicode):
+            strring = strx
+        else:
+            strring = str(strx).decode('utf-8')
+
         i = 0
         out = ''
         while i < len(strring):
@@ -139,33 +149,21 @@ class Sheet(object):
 
     #转换字符串为dict
     def __convertStrToDict(self, str):
-        dict = {}
-        list = str.split(',')
-        for i in range(len(list)):
-            kv = list[i].split(':')
-            key = kv[0]
-            value = kv[1]
-
-            if value.isdigit() and '.' in value:
-                dict[key] = float(value)
-            elif value.isdigit():
-                dict[key] = int(value)
-            else:
-                dict[key] = value
+        lex = dictLexer.DictLexer()
+        dict = lex.parseText(str)
 
         return dict
 
     def log(self):
-        print '类型行', self.typeRow
-        print '配置字段名行', self.cfgNameRow
-        print '中文字段名行', self.chinaNameRow
-        print '数据起始行', self.dataStartRow
-        print '数据终止行', self.dataEndRow
-        print '数据终止列', self.dataEndCol
-        print '字段属性'
+        print u'类型行', self.typeRow
+        print u'配置字段名行', self.cfgNameRow
+        print u'中文字段名行', self.chinaNameRow
+        print u'数据起始行', self.dataStartRow
+        print u'数据终止行', self.dataEndRow
+        print u'数据终止列', self.dataEndCol
+        print u'字段属性'
         for field in self.fieldList:
             print field
-
 
     #获得当前行的recordId,主键
     def __getRecordId(self, row):
@@ -207,6 +205,7 @@ class Sheet(object):
                     record[fieldName] = value
                 elif fieldType == 's':
                     record[fieldName] = self.__praseStr(value)
+                    # record[fieldName] = value
                 elif fieldType == 'b':
                     record[fieldName] = bool(value)
                 elif fieldType == 'as' or fieldType == 'ai' or fieldType == 'af':

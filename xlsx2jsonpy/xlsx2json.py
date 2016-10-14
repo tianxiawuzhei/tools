@@ -6,10 +6,9 @@
 '''
 
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 import getopt, xlrd, os, os.path, json
+import codecs
 
 import Sheet
 
@@ -29,7 +28,7 @@ def xls2json(xlsPath, xlsName):
     try:
         xlsfile = xlrd.open_workbook(xlsPath)
     except Exception, e:
-        print("[ERROR] => get data from %s faild" % xlsPath)
+        print("[ERROR] => get configuration file from %s faild!" % xlsPath)
         raise e
 
     # 根据索引来获取sheet
@@ -38,7 +37,7 @@ def xls2json(xlsPath, xlsName):
 
     #保存到文件中
     try:
-        f = open("%s/map_%s.json" % (jsonDir, xlsName), 'w')
+        f = codecs.open("%s/map_%s.json" % (jsonDir, xlsName), 'w', 'utf-8')
         f.write(shet.toJSON())
         print("INFO :" + xlsName + "   " + u"转换成功")
     except Exception, e:
@@ -48,9 +47,8 @@ def xls2json(xlsPath, xlsName):
             f.close()
 
 def tojson(xlsDir):
-    # xlsList = ["Warrior.xls", "Items.xls", "Skill.xlsx", "LevelScene.xlsx"]
-	for parent, dirnames, filenames in os.walk(xlsDir):
-            for filename in filenames:
+    for parent, dirnames, filenames in os.walk(xlsDir):
+        for filename in filenames:
             # if filename in xlsList:
                 if not filename.startswith("~"):
                     extension = os.path.splitext(filename)[1]

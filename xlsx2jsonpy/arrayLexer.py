@@ -10,7 +10,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-class lexical(object):
+class ArrayLexer(object):
     def __init__(self):
         self._index = 0
         self._text = ""

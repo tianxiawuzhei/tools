@@ -2,64 +2,15 @@
 # -*- coding: utf-8 -*-
 
 '''
-
+分析 ',' 分割键值对,':'分割键和值 的文本,如果是value值是字符串,支持转义字符,但是需要用双引号引起来
+最终转化为python中的dict.
+eg: r'1:2.0,ne:"\\a\nc"'
 '''
 
 import sys
-# reload(sys)
-# sys.setdefaultencoding('UTF-8')
-
-import json
-import arrayLexer
-import codecs
-import re
 import utils
 
-#test1 文件方式
-# if len(sys.argv) != 2:
-#     print 'Please specify one filename on the command line.'
-#     sys.exit(1)
-#
-# filename = sys.argv[1]
-# body = file(filename, 'rt').read()
-# print 'ORIGINAL:', repr(body)
-# print '\n'
-
-#test2 字符串方式
-# body = '"\\\\4","5\\\\6"'
-# print 'ORIGINAL:', repr(body)
-# print '\n'
-#
-# lex = lexical.lexical()
-# print (json.dumps(lex.prase(body), sort_keys=True, indent=2, ensure_ascii=False))
-# #relutl:
-# # ORIGINAL: '"\\\\4","5\\\\6"'
-# #
-# #
-# # [
-# #   "\\4",
-# #   "5\\6"
-# # ]
-#
-#
-# #test3
-# body = '"\\"a\\\\\ne,\\"r",d\n\\\\d,a'
-# print 'ORIGINAL:', repr(body)
-# print '\n'
-#
-# lex = lexical.lexical()
-# print (json.dumps(lex.prase(body), sort_keys=True, indent=2, ensure_ascii=False))
-# # relust
-# # ORIGINAL: '"\\"a\\\\\ne,\\"r",dd,a'
-# #
-# #
-# [
-#   "\"a\\\ne,\"r",
-#   "dd",
-#   "a"
-# ]
-
-class dictlexer(object):
+class DictLexer(object):
     def __init__(self):
         self._cursor = 0
         self._endCursor = 0
@@ -101,13 +52,21 @@ class dictlexer(object):
         cursor += 1
         # out = self._praseStr(kvStr[cursor:])
         out = kvStr[cursor:]
-        if utils.is_number(out):
-            if '.' in out:
-                self._dic[k] = float(out)
-            else:
-                self._dic[k] = int(out)
-        else:
+
+        #因为有 '1e3' 这样的数字字符串, 而且is_number会判断为数字
+        #这里不支持科学计数的数字,所以如果字符串有 'e', 则直接判定为字符串
+        #不进行整形或浮点型判别
+        if 'e' in out:
             self._dic[k] = out
+        else:
+            if utils.is_number(out):
+                if '.' in out:
+                    self._dic[k] = float(out)
+                else:
+                    self._dic[k] = int(out)
+            else:
+                self._dic[k] = out
+
 
     #解析逗号分割
     def _decodeComma(self, text):
@@ -158,31 +117,3 @@ class dictlexer(object):
 
     def _nextCursor(self):
         self._cursor += 1
-
-if __name__ == '__main__':
-    # test1 文件方式
-    if len(sys.argv) != 2:
-        print 'Please specify one filename on the command line.'
-        sys.exit(1)
-
-    filename = sys.argv[1]
-    fileObj = codecs.open(filename, "r", "utf_8")
-    body = fileObj.read()
-    print body
-    # body = r'1:2.0,ne:"\\a\nc"'
-    # print 'ORIGINAL:', body
-    # print '\n'
-    # #
-    #
-    #
-    lex = dictlexer()
-    print (json.dumps(lex.parseText(body), sort_keys=True, indent=2, ensure_ascii=False))
-
-
-
-
-
-
-
-
-
