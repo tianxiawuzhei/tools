@@ -39,11 +39,11 @@ def xls2json(xlsPath, xlsName):
 
     #保存到文件中
     try:
-        f = codecs.open("%s/map_%s.json" % (jsonDir, xlsName), 'w', 'utf-8')
+        f = codecs.open("%s/map_%s.json" % (jsonDir, xlsName.decode('utf-8')), 'w', 'utf-8')
         f.write(shet.toJSON())
-        print("INFO :" + xlsName + "   " + u"转换成功")
+        print("INFO :" + xlsName.decode('utf-8') + "   " + u"转换成功")
     except Exception, e:
-        print("ERROR :" + xlsName + "   " + u"转换失败", e)
+        print("ERROR :" + xlsName.decode('utf-8') + "   " + u"转换失败", e)
     finally:
         if f:
             f.close()

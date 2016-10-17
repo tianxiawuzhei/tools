@@ -14,15 +14,15 @@ sys.path.append('..')
 from comutil import Sheet
 
 def errorHelp():
-    print(u"发生了一些错误,请输入python xlsx2json.py -h来获取帮助");
+    print(u"发生了一些错误,请输入python xlsx2lua.py -h来获取帮助")
 
 def showHelp():
     print u"""
 -h 帮助
 -i xlsx所在目录,必填
--o json的输出目录,必填
+-o lua的输出目录,必填
 例如:
-python xlsx2json.py -i 配置目录 -o 输出目录
+python xlsx2lua.py -i 配置目录 -o 输出目录
 """
 
 def xls2lua(xlsPath, xlsName):
@@ -38,11 +38,11 @@ def xls2lua(xlsPath, xlsName):
 
     #保存到文件中
     try:
-        f = codecs.open("%s/map_%s.lua" % (jsonDir, xlsName), 'w', 'utf-8')
+        f = codecs.open("%s/map_%s.lua" % (luaDir, xlsName.decode('utf-8')), 'w', 'utf-8')
         f.write(shet.toLua())
-        print("INFO :" + xlsName + "   " + u"转换成功")
+        print("INFO :" + xlsName.decode('utf-8') + "   " + u"转换成功")
     except Exception, e:
-        print("ERROR :" + xlsName + "   " + u"转换失败", e)
+        print("ERROR :" + xlsName.decode('utf-8') + "   " + u"转换失败", e)
     finally:
         if f:
             f.close()
@@ -67,12 +67,12 @@ def main():
             elif option in ["-i", "--input"]:
                 xlsDir = value
             elif option in ["-o", "--output"]:
-                global jsonDir
-                jsonDir = value
-                if not os.path.exists(jsonDir):
-                    os.mkdir(jsonDir)
-        if not jsonDir:
-            jsonDir = ''
+                global luaDir
+                luaDir = value
+                if not os.path.exists(luaDir):
+                    os.mkdir(luaDir)
+        if not luaDir:
+            luaDir = ''
         if not xlsDir:
             errorHelp()
         else:
