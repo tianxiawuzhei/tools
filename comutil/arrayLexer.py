@@ -7,8 +7,6 @@
 '''
 
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 class ArrayLexer(object):
     def __init__(self):
@@ -112,7 +110,7 @@ def test():
     # print 'ORIGINAL:', repr(body)
     print '\n'
 
-    lex = lexical()
+    lex = ArrayLexer()
     lex.prase(body)
     print(lex.getTextList())
 

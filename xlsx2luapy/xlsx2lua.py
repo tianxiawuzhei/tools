@@ -7,11 +7,10 @@
 
 import sys
 
-sys.path.append('../')
-
 import getopt, xlrd, os, os.path, json
 import codecs
 
+sys.path.append('..')
 from comutil import Sheet
 
 def errorHelp():
@@ -26,7 +25,7 @@ def showHelp():
 python xlsx2json.py -i 配置目录 -o 输出目录
 """
 
-def xls2json(xlsPath, xlsName):
+def xls2lua(xlsPath, xlsName):
     try:
         xlsfile = xlrd.open_workbook(xlsPath)
     except Exception, e:
@@ -39,8 +38,8 @@ def xls2json(xlsPath, xlsName):
 
     #保存到文件中
     try:
-        f = codecs.open("%s/map_%s.json" % (jsonDir, xlsName), 'w', 'utf-8')
-        f.write(shet.toJSON())
+        f = codecs.open("%s/map_%s.lua" % (jsonDir, xlsName), 'w', 'utf-8')
+        f.write(shet.toLua())
         print("INFO :" + xlsName + "   " + u"转换成功")
     except Exception, e:
         print("ERROR :" + xlsName + "   " + u"转换失败", e)
@@ -48,14 +47,14 @@ def xls2json(xlsPath, xlsName):
         if f:
             f.close()
 
-def tojson(xlsDir):
+def toLua(xlsDir):
     for parent, dirnames, filenames in os.walk(xlsDir):
         for filename in filenames:
             # if filename in xlsList:
                 if not filename.startswith("~"):
                     extension = os.path.splitext(filename)[1]
                     if (extension == ".xls" or extension == ".xlsx"):
-                        xls2json(os.path.join(parent, filename), os.path.splitext(filename)[0])
+                        xls2lua(os.path.join(parent, filename), os.path.splitext(filename)[0])
 
 
 def main():
@@ -77,7 +76,7 @@ def main():
         if not xlsDir:
             errorHelp()
         else:
-            tojson(xlsDir)
+            toLua(xlsDir)
     except getopt.GetoptError:
         errorHelp()
 

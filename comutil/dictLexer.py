@@ -114,6 +114,5 @@ class DictLexer(object):
         else:
             raise IndexError("text index out of range.", self._cursor, self._endCursor)
 
-
     def _nextCursor(self):
         self._cursor += 1

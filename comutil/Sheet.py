@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import xlrd
 import json
 import math
+
+from xlrd import XL_CELL_EMPTY, XL_CELL_TEXT, XL_CELL_NUMBER
+
 import arrayLexer
-import dictLexer
-import types
-from types import *
-from xlrd import XL_CELL_EMPTY, XL_CELL_TEXT, XL_CELL_NUMBER, XL_CELL_DATE, XL_CELL_BOOLEAN, XL_CELL_ERROR, \
-    XL_CELL_BLANK
+from . import dictLexer
+from . import tolua
+
 
 class Field(object):
     def __init__(self):
@@ -253,5 +253,18 @@ class Sheet(object):
         json_obj = json.dumps(self.toPython(sheet_output_field), sort_keys=True, indent=2, ensure_ascii=False)
         return json_obj
 
+
+    def toLua(self):
+        sheet_output_field = []
+        for col in range(0, self.dataEndCol):
+            field = self.fieldList[col]
+            fieldUserType = field.userType
+            if fieldUserType == 0 or fieldUserType == 1:
+                sheet_output_field.append(field.cfgName)
+
+        luaD = tolua.ToLua()
+        data = self.toPython(sheet_output_field)
+        s = ('%s' % '\n').join(['t[%s] = %s' % (k, luaD.encode(v)) for k, v in data.items()])
+        return 't = {}\n%s\n' % s
 def openSheet(shet):
     return Sheet(shet)
